@@ -2,10 +2,10 @@
 Contributors: stiofansisland, paoltaia, ayecode
 Tags: events, calendar, event, schedule, organizer, geodirectory, event listings, events directory, event manager, events calendar
 Donate link: https://wpgeodirectory.com
-Requires at least: 5.0
-Tested up to: 6.9
+Requires at least: 6.0
+Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.3.26
+Stable tag: 2.3.27
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -69,6 +69,9 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 3. Go to WordPress Admin -> Events -> Settings and customize behaviour as needed
 
 == Changelog ==
+
+= 2.3.27 - 2026-04-09 =
+* WordPress 7.0 compatibility check - COMPATIBILITY
 
 = 2.3.26 - 2026-03-11 =
 * Validate sanitized event date before save - FIXED
