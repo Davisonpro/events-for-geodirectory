@@ -70,6 +70,9 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 == Changelog ==
 
+= 2.3.28 - 2026-05-TBD =
+* Ignore default event type filter on date range searches - FIXED
+
 = 2.3.27 - 2026-04-09 =
 * WordPress 7.0 compatibility check - COMPATIBILITY
 

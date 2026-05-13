@@ -28,6 +28,6 @@ foreach ( $event_types as $value => $label ) {
 	$options .= '<option ' . selected( $value, $event_type, false ) . ' value="' . esc_url( $url ) . '">' . $label . '</option>';
 }
 ?>
-<div class="geodir-event-filter">
+<div class="	">
 <select name="etype" id="etype" class="geodir-select" onchange="javascript:window.location=this.value;"><?php echo $options;?></select>
 </div>

@@ -99,7 +99,7 @@ function geodir_event_display_event_type_filter( $post_type ) {
 
 	$design_style = geodir_design_style();
 	
-	$event_type 	= ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : geodir_get_option( 'event_default_filter' );
+	$event_type 	= ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : ( ! empty( $_REQUEST['event_dates'] ) ? 'all' : geodir_get_option( 'event_default_filter' ) );
 	$current_url 	= str_replace( '#038;', '&', geodir_curPageURL() );
 	
 	//Search and remove the current page number from url
