@@ -233,21 +233,14 @@ class GeoDir_Event_Query {
 
 		$schedules_table = GEODIR_EVENT_SCHEDULES_TABLE;
 
-		$event_type = ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : geodir_get_option( 'event_default_filter' );
-		if ( ( $gd_event_type = get_query_var( 'gd_event_type' ) ) ) {
-			$event_type = $gd_event_type;
-		}
-
-		if ( ( $condition = GeoDir_Event_Schedules::event_type_condition( $event_type ) ) ) {
-			$where .= " AND " . $condition;
-		}
+		$date_where = '';
 
 		if ( geodir_is_page( 'search' ) ) {
 			if ( ! empty( $_REQUEST['event_calendar'] ) ) {
 				$filter_date = sanitize_text_field( $_REQUEST['event_calendar'] );
 				$filter_date = substr( $filter_date, 0, 4 ) . '-' . substr( $filter_date , 4, 2 ) . '-' . substr( $filter_date, 6, 2 );
 
-				$where .= " AND ( start_date = '" . $filter_date . "' OR ( start_date <= '" . $filter_date . "' AND end_date >= '" . $filter_date . "' ) )";
+				$date_where .= " AND ( start_date = '" . $filter_date . "' OR ( start_date <= '" . $filter_date . "' AND end_date >= '" . $filter_date . "' ) )";
 			}
 
 			if ( ! empty( $_REQUEST['event_dates'] ) ) {
@@ -270,23 +263,37 @@ class GeoDir_Event_Query {
 					$to_date = ! empty( $event_dates['to'] ) ? date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates['to'] ) ) ) : '';
 
 					if ( ! empty( $from_date ) && ! empty( $to_date ) ) {
-						$where .= " AND ( ( '{$from_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.start_date BETWEEN '{$from_date}' AND {$schedules_table}.end_date ) ) AND ( ( '{$to_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.end_date BETWEEN {$schedules_table}.start_date AND '{$to_date}' ) ) ";
+						$date_where .= " AND ( ( '{$from_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.start_date BETWEEN '{$from_date}' AND {$schedules_table}.end_date ) ) AND ( ( '{$to_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.end_date BETWEEN {$schedules_table}.start_date AND '{$to_date}' ) ) ";
 					} else {
 						if ( $from_date || $to_date ) {
 							$date = ! empty( $from_date ) ? $from_date : $to_date;
 
 							if ( $from_date ) {
-								$where .= " AND ( {$schedules_table}.start_date >='{$date}' OR ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ) ";
+								$date_where .= " AND ( {$schedules_table}.start_date >='{$date}' OR ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ) ";
 							} elseif ( $to_date ) {
-								$where .= " AND ( {$schedules_table}.end_date <='{$date}' OR ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ) ";
+								$date_where .= " AND ( {$schedules_table}.end_date <='{$date}' OR ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ) ";
 							}
 						}
 					}
 				} else {
 					$date = date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates ) ) );
-					$where .= " AND ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ";
+					$date_where .= " AND ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ";
 				}
 			}
+		}
+
+		$event_type = ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : get_query_var( 'gd_event_type' );
+
+		if ( empty( $event_type ) ) {
+			$event_type = ! empty( $date_where ) ? 'all' : geodir_get_option( 'event_default_filter' );
+		}
+
+		if ( ( $condition = GeoDir_Event_Schedules::event_type_condition( $event_type ) ) ) {
+			$where .= " AND " . $condition;
+		}
+
+		if ( $date_where ) {
+			$where .= $date_where;
 		}
 
 		return $where;
