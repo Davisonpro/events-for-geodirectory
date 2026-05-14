@@ -5,7 +5,7 @@ Donate link: https://wpgeodirectory.com
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.3.27
+Stable tag: 2.3.28
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,7 +70,7 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 == Changelog ==
 
-= 2.3.28 - 2026-05-TBD =
+= 2.3.28 - 2026-05-14 =
 * Ignore default event type filter on date range searches - FIXED
 
 = 2.3.27 - 2026-04-09 =
