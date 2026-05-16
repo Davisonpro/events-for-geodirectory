@@ -95,7 +95,7 @@ class GeoDir_Event_AYI {
 			return false;
 		}
 
-		$gde = isset( $_GET['gde'] ) ? sanitize_text_field( strip_tags( $_GET['gde'] ) ) : false;
+		$gde = isset( $_GET['gde'] ) ? sanitize_key( $_GET['gde'] ) : false;
 
 		if ( ! empty( $schedule->all_day ) ) {
 			if ( ! empty( $gde ) ) {
@@ -152,10 +152,15 @@ class GeoDir_Event_AYI {
 	public static function ajax_ayi_action() {
 		check_ajax_referer('geodir-ayi-nonce', 'geodir_ayi_nonce');
 		//set variables
-		$action = strip_tags(esc_sql($_POST['btnaction']));
-		$type = strip_tags(esc_sql($_POST['type']));
-		$post_id = strip_tags(esc_sql($_POST['postid']));
-		$gde = strip_tags(esc_sql($_POST['gde']));
+		$action = 'add' === $_POST['btnaction'] ? 'add' : 'remove' ;
+		$type = 'event_rsvp_yes' === $_POST['type'] ? 'event_rsvp_yes' : 'event_rsvp_maybe';
+		$post_id = absint($_POST['postid']);
+		$gde = !empty($_POST['gde']) ? sanitize_key( $_POST['gde'] ) : '';
+
+        // check we have a date
+		if ( !empty($gde) && !geodir_event_is_date( $gde ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid date provided.', 'geodirectory' ) ) );
+		}
 
 		$rsvp_args = array();
 		$rsvp_args['action'] = $action;
@@ -167,7 +172,7 @@ class GeoDir_Event_AYI {
 		$post = geodir_get_post_info($post_id);
 
 		$current_date = date_i18n( 'Y-m-d H:i:s', time() );
-		$gde = !empty($gde) ? sanitize_text_field( strip_tags( $gde ) ) : false;
+		$gde = !empty($gde) ? sanitize_key( $gde ) : false;
 		$schedule = GeoDir_Event_Schedules::get_start_schedule( $post->ID );
 
 		if ( ! empty( $schedule->all_day ) ) {
@@ -221,8 +226,13 @@ class GeoDir_Event_AYI {
 					};
 
 					jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function (response) {
-						jQuery(this).removeClass('disabled');
-						container.html(response);
+                        if( response.success === false){
+                            alert(response.data.message);
+                        }else{
+                            jQuery(this).removeClass('disabled');
+                            container.html(response);
+                        }
+
 						<?php
 						if(geodir_design_style()){
 							echo "aui_init();";
@@ -302,10 +312,20 @@ class GeoDir_Event_AYI {
 			return;
 		}
 
+        // Validate and sanitize input parameters
+        $rsvp_args['action'] = 'add' === $rsvp_args['action'] ? 'add' : 'remove' ;
+        $rsvp_args['type'] = 'event_rsvp_yes' === $rsvp_args['type'] ? 'event_rsvp_yes' : 'event_rsvp_maybe';
+        $rsvp_args['post_id'] = absint($rsvp_args['post_id']);
+        $rsvp_args['gde'] = !empty($rsvp_args['gde']) ? sanitize_key( $rsvp_args['gde'] ) : false;
+
+        if ( ! isset( $rsvp_args['action'] ) || ! isset( $rsvp_args['type'] ) || ! isset( $rsvp_args['post_id'] ) ) {
+            return;
+        }
+
 		$current_user = wp_get_current_user();
 
 		$users = get_post_meta( $rsvp_args['post_id'], $rsvp_args['type'], true );
-		$gde = ! empty( $rsvp_args['gde'] ) ? sanitize_text_field( strip_tags( $rsvp_args['gde'] ) ) : false;
+		$gde = ! empty( $rsvp_args['gde'] ) ? sanitize_key( $rsvp_args['gde'] ) : false;
 
 		if ( ! is_array( $users ) ) {
 			$users = array();
@@ -590,7 +610,7 @@ class GeoDir_Event_AYI {
 
 
 			} elseif (isset($event_details['recurring'])) {
-				$gde = isset( $_GET['gde'] ) ? sanitize_text_field( strip_tags($_GET['gde']) ) : false;
+				$gde = isset( $_GET['gde'] ) ? sanitize_key($_GET['gde']) : false;
 
 				if ($gde) {
 					$event_start_date = $event_details['event_start'] ? date('l, F j, Y', strtotime($gde)) : '';
