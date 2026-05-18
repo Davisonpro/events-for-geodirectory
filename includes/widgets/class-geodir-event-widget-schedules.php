@@ -341,7 +341,7 @@ class GeoDir_Event_Widget_Schedules extends WP_Super_Duper {
 				$format_timezone = $timezone_offset == '+0' ? "" : str_replace( ":00", "", $timezone_offset );
 				$tz_offset_html  = '<div class="geodir-tz-offset text-muted d-inline-block ps-1 pl-1">GMT' . $format_timezone . '</div>';
 				$tz_offset_html  = apply_filters( 'geodir_event_schedule_timezone_offset_html', $tz_offset_html, $format_timezone, $timezone_offset, $gd_post );
-				$schedule_row    .= ' ' . trim( strip_tags( $tz_offset_html ) );
+				$schedule_row    .= ' ' . trim( wp_strip_all_tags( $tz_offset_html ) );
 			}
 			$schedule_row = '<div class="geodir-schedule-row '.$row_class.'">' . $schedule_row . '</div>';
 			$schedule_row = apply_filters( 'geodir_event_widget_schedule_html', $schedule_row, $row, $template, $date_format, $time_format, $timezone_offset );
