@@ -70,6 +70,9 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 == Changelog ==
 
+= 2.3.30 - 2026-05-TBD =
+* Interested/Going buttons not visible on ongoing event with past start date - FIXED
+
 = 2.3.29 - 2026-05-16 =
 * Better sanitation for AYI Widget - FIXED/SECURITY
 

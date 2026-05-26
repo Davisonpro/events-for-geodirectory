@@ -469,7 +469,7 @@ class GeoDir_Event_Schedules {
 		return $schedules;
 	}
 
-	public static function get_upcoming_schedule( $post_id, $date = '' ) {
+	public static function get_upcoming_schedule( $post_id, $date = '', $ongoing = false ) {
 		global $wpdb;
 
 		if ( empty( $post_id ) ) {
@@ -477,7 +477,27 @@ class GeoDir_Event_Schedules {
 		}
 
 		$where = array( 'event_id = %d' );
-		if ( ( $condition = self::event_type_condition( 'upcoming', '', $date ) ) ) {
+		$type  = $ongoing ? 'ongoing_upcoming' : 'upcoming';
+		if ( ( $condition = self::event_type_condition( $type, '', $date ) ) ) {
+			$where[] = $condition;
+		}
+
+		$where = implode( ' AND ', $where );
+
+		$schedules = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM " . GEODIR_EVENT_SCHEDULES_TABLE . " WHERE {$where} ORDER BY start_date ASC, start_time ASC LIMIT 1", array( $post_id ) ) );
+
+		return $schedules;
+	}
+
+	public static function get_ongoing_schedule( $post_id, $date = '' ) {
+		global $wpdb;
+
+		if ( empty( $post_id ) ) {
+			return false;
+		}
+
+		$where = array( 'event_id = %d' );
+		if ( ( $condition = self::event_type_condition( 'ongoing', '', $date ) ) ) {
 			$where[] = $condition;
 		}
 

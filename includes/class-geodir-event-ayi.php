@@ -79,42 +79,44 @@ class GeoDir_Event_AYI {
 
 		extract( $args, EXTR_SKIP );
 
-//		if ( ! get_current_user_id() ) {
-//			return false;
-//		}
-		if ( !$args['is_preview'] && ! geodir_is_page( 'detail' ) ) {
-			return false;
-		}
-		if ( !$args['is_preview'] && ! GeoDir_Post_types::supports( get_query_var( 'post_type' ), 'events' ) ) {
+		if ( ! $args['is_preview'] && ! geodir_is_page( 'detail' ) ) {
 			return false;
 		}
 
+		if ( ! $args['is_preview'] && ! GeoDir_Post_types::supports( get_query_var( 'post_type' ), 'events' ) ) {
+			return false;
+		}
+
+		$gde          = isset( $_GET['gde'] ) ? sanitize_text_field( strip_tags( $_GET['gde'] ) ) : false;
 		$current_date = date_i18n( 'Y-m-d H:i:s', time() );
-		$schedule = GeoDir_Event_Schedules::get_start_schedule( $post->ID );
-		if ( !$args['is_preview'] && empty( $schedule ) ) {
-			return false;
+		$schedule     = GeoDir_Event_Schedules::get_upcoming_schedule( $post->ID, $gde, true );
+		if ( empty( $schedule ) ) {
+			$schedule = GeoDir_Event_Schedules::get_start_schedule( $post->ID );
 		}
 
-		$gde = isset( $_GET['gde'] ) ? sanitize_key( $_GET['gde'] ) : false;
+		if ( ! $args['is_preview'] && empty( $schedule ) ) {
+			return false;
+		}
 
 		if ( ! empty( $schedule->all_day ) ) {
 			if ( ! empty( $gde ) ) {
-				$event_start_date = date_i18n( 'Y-m-d H:i:s', strtotime( $gde ) );
+				$event_start_date = date_i18n( 'Y-m-d 00:00:00', strtotime( $gde ) );
 			} else {
-				$event_start_date = date_i18n( 'Y-m-d H:i:s', strtotime( $schedule->start_date ) );
+				$event_start_date = $schedule->start_date . ' 00:00:00';
 			}
+
+			$event_end_date = $schedule->end_date . ' 23:59:59';
 		} else {
 			if ( ! empty( $gde ) ) {
 				$event_start_date = date_i18n( 'Y-m-d H:i:s', strtotime( $gde . ' ' . $schedule->start_time ) );
 			} else {
-				$event_start_date = date_i18n( 'Y-m-d H:i:s', strtotime( $schedule->start_date . ' ' . $schedule->start_time ) );
+				$event_start_date = $schedule->start_date . ' ' . $schedule->start_time;
 			}
+
+			$event_end_date = $schedule->end_date . ' ' . $schedule->end_time;
 		}
 
-		$buttons = false;
-		if ( strtotime( $event_start_date ) > strtotime( $current_date ) ) {
-			$buttons = true;
-		}
+		$buttons = ( strtotime( $event_start_date ) >= strtotime( $current_date ) ) || ( strtotime( $event_start_date ) < strtotime( $current_date ) && strtotime( $event_end_date ) >= strtotime( $current_date ) );
 
 		ob_start();
 		?>
