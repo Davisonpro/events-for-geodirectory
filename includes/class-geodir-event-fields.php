@@ -1492,7 +1492,7 @@ class GeoDir_Event_Fields {
 	}
 
 	public static function search_bar_output_event_aui( $html, $cf, $post_type ) {
-		global $aui_bs5, $as_fieldset_start;
+		global $aui_bs5, $geodir_search_widget_params, $as_fieldset_start;
 
 		if ( ! ( ! empty( $cf ) && $cf->htmlvar_name == 'event_dates' ) ) {
 			return $html;
@@ -1508,11 +1508,13 @@ class GeoDir_Event_Fields {
 		// Convert to jQuery UI datepicker format.
 		$datepicker_format  = geodir_date_format_php_to_aui( $date_format  );
 		$wrap_attrs = function_exists( 'geodir_search_conditional_field_attrs' ) ? geodir_search_conditional_field_attrs( $cf ) : '';
+		$input_class = ! empty( $geodir_search_widget_params['input_size'] ) ? ' form-control-' . $geodir_search_widget_params['input_size'] : '';
+		$input_class .= ! empty( $geodir_search_widget_params['main_search_inputs_class'] ) ? ' ' . $geodir_search_widget_params['main_search_inputs_class'] : '';
 
 		ob_start();
 		if ( $cf->search_condition == 'FROM' ) {
 			if ( empty( $field_label ) ) {
-				$field_label = wp_sprintf( __( '%s Dates', 'geodiradvancesearch' ), $pt_name );
+				$field_label = wp_sprintf( __( '%s Dates', 'geodirevents' ), $pt_name );
 			}
 			?>
 			<div class="gd-search-has-date gd-search-<?php echo $htmlvar_name; ?> from-to col-auto flex-fill<?php echo ( $aui_bs5 ? ' px-0' : '' ); ?>"<?php echo $wrap_attrs; ?>>
@@ -1535,7 +1537,7 @@ class GeoDir_Event_Fields {
 						'name'              => $htmlvar_name,
 						'type'              => 'datepicker',
 						'placeholder'       => $field_label,
-						'class'             => '',
+						'class'             => $input_class,
 						'value'             => esc_attr( $event_dates ),
 						'extra_attributes'  => $extra_attributes,
 						'form_group_class'  => ( $aui_bs5 ? ' ' : '' ), // Remove bottom margin for BS5
@@ -1568,7 +1570,7 @@ class GeoDir_Event_Fields {
 						'name'              => $htmlvar_name,
 						'type'              => 'datepicker',
 						'placeholder'       => $field_label,
-						'class'             => '',
+						'class'             => $input_class,
 						'value'             => esc_attr( $event_dates ),
 						'extra_attributes'  => $extra_attributes,
 						'form_group_class'  => ( $aui_bs5 ? ' ' : '' ), // Remove bottom margin for BS5
