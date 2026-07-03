@@ -664,6 +664,7 @@ class GeoDir_Event_Fields {
 						'3'      =>  esc_html__( '3rd week', 'geodirevents' ),
 						'4'      =>  esc_html__( '4th week', 'geodirevents' ),
 						'5'      =>  esc_html__( '5th week', 'geodirevents' ),
+						'last'   =>  esc_html__( 'Last week', 'geodirevents' ),
 					),
 					'multiple'          => true,
 					'select2'           => true,
@@ -1346,6 +1347,7 @@ class GeoDir_Event_Fields {
 
 			if ( ! empty( $schedule->start_date ) ) {
 				$value = GeoDir_Event_Schedules::get_schedules_html( array( (object)$schedule ), false, $event_post );
+				$value = str_replace( '<i class="fas fa-caret-right"></i> ', '', $value );
 
 				$field_icon = geodir_field_icon_proccess( $cf );
 				$output = geodir_field_output_process( $output );

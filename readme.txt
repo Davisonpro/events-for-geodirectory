@@ -70,6 +70,9 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 == Changelog ==
 
+= 2.3.31 - 2026-07-TBD =
+* Added option for 'last week' days in monthly recurring - ADDED
+
 = 2.3.30 - 2026-06-04 =
 * Interested/Going buttons not visible on ongoing event with past start date - FIXED
 
