@@ -5,7 +5,7 @@ Donate link: https://wpgeodirectory.com
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 2.3.30
+Stable tag: 2.3.31
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -70,7 +70,7 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 == Changelog ==
 
-= 2.3.31 - 2026-07-TBD =
+= 2.3.31 - 2026-07-08 =
 * Added option for 'last week' days in monthly recurring - ADDED
 * New Event Countdown widget to show a live countdown to the event start - ADDED
 * Sortable Start date column on the events admin list table - ADDED
