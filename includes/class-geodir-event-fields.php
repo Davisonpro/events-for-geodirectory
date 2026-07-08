@@ -883,6 +883,7 @@ class GeoDir_Event_Fields {
 					<option value="3" <?php selected( true, in_array( 3, $repeat_weeks ) ); ?>><?php _e( '3rd week', 'geodirevents' ); ?></option>
 					<option value="4" <?php selected( true, in_array( 4, $repeat_weeks ) ); ?>><?php _e( '4th week', 'geodirevents' ); ?></option>
 					<option value="5" <?php selected( true, in_array( 5, $repeat_weeks ) ); ?>><?php _e( '5th week', 'geodirevents' ); ?></option>
+					<option value="last" <?php selected( true, in_array( 'last', $repeat_weeks ) ); ?>><?php _e( 'Last week', 'geodirevents' ); ?></option>
 				</select>
 	        </div>
 			<div id="geodir_event_recurring_ends_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">

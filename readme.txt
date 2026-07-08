@@ -72,6 +72,9 @@ Get your hands on all the Events Calendar for GeoDirectory premium add-ons and t
 
 = 2.3.31 - 2026-07-TBD =
 * Added option for 'last week' days in monthly recurring - ADDED
+* New Event Countdown widget to show a live countdown to the event start - ADDED
+* Sortable Start date column on the events admin list table - ADDED
+* Improved event schema for Google rich results: added performer/offers/organizer url and corrected date/timezone output - FIXED
 
 = 2.3.30 - 2026-06-04 =
 * Interested/Going buttons not visible on ongoing event with past start date - FIXED
