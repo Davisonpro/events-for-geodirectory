@@ -73,6 +73,17 @@ class GeoDir_Event_Admin_Install {
 	 * This function is hooked into admin_init to affect admin only.
 	 */
 	public static function install_actions() {
+		if ( empty( $_GET['do_update_geodir_event'] ) && empty( $_GET['force_update_geodir_event'] ) ) {
+			return;
+		}
+
+		// Running the updater is an admin only action.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to run the Events updater.', 'geodirevents' ), 403 );
+		}
+
+		check_admin_referer( 'geodir_event_install_actions' );
+
 		if ( ! empty( $_GET['do_update_geodir_event'] ) ) {
 			self::update();
 		}
@@ -84,6 +95,22 @@ class GeoDir_Event_Admin_Install {
 			wp_safe_redirect( admin_url( 'admin.php?page=gd-settings' ) );
 			exit;
 		}
+	}
+
+	/**
+	 * Get a nonced URL to run one of the install actions.
+	 *
+	 * @since 2.3.33
+	 *
+	 * @param string $action Action key, `do_update_geodir_event` or `force_update_geodir_event`.
+	 * @return string Nonced admin URL.
+	 */
+	public static function install_action_url( $action = 'do_update_geodir_event' ) {
+		if ( ! in_array( $action, array( 'do_update_geodir_event', 'force_update_geodir_event' ), true ) ) {
+			$action = 'do_update_geodir_event';
+		}
+
+		return wp_nonce_url( add_query_arg( $action, 'true', admin_url( 'admin.php?page=gd-settings' ) ), 'geodir_event_install_actions' );
 	}
 
 	/**

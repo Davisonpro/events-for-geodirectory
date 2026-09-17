@@ -219,9 +219,20 @@ class GeoDir_Event_Admin {
 	public function admin_redirects() {
 		// Nonced plugin install redirects (whitelisted)
 		if ( ! empty( $_GET['geodir-event-install-redirect'] ) ) {
-			$plugin_slug = geodir_clean( $_GET['geodir-event-install-redirect'] );
+			if ( ! current_user_can( 'install_plugins' ) ) {
+				return;
+			}
 
-			$url = admin_url( 'plugin-install.php?tab=search&type=term&s=' . $plugin_slug );
+			$plugin_slug = sanitize_text_field( geodir_clean( wp_unslash( $_GET['geodir-event-install-redirect'] ) ) );
+
+			$url = add_query_arg(
+				array(
+					'tab'  => 'search',
+					'type' => 'term',
+					's'    => $plugin_slug
+				),
+				admin_url( 'plugin-install.php' )
+			);
 
 			wp_safe_redirect( $url );
 			exit;
@@ -243,9 +254,9 @@ class GeoDir_Event_Admin {
 	}
 
 	public static function load_settings_page( $settings_pages ) {
-		$post_type = ! empty( $_REQUEST['post_type'] ) ? sanitize_text_field( $_REQUEST['post_type'] ) : 'gd_place';
+		$post_type = ! empty( $_REQUEST['post_type'] ) ? sanitize_key( wp_unslash( $_REQUEST['post_type'] ) ) : 'gd_place';
 
-		if ( ! ( ! empty( $_REQUEST['page'] ) && sanitize_text_field( $_REQUEST['page'] ) == $post_type . '-settings' ) ) {
+		if ( ! ( ! empty( $_REQUEST['page'] ) && sanitize_key( wp_unslash( $_REQUEST['page'] ) ) == $post_type . '-settings' ) ) {
 			$settings_pages[] = include( GEODIR_EVENT_PLUGIN_DIR . 'includes/admin/settings/class-geodir-event-settings-events.php' );
 		}
 

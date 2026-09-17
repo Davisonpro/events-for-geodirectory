@@ -62,19 +62,19 @@ class GeoDir_Event_AJAX {
 		}
 
 		try {
-			$post_type = ! empty( $_POST['post_type'] ) ? sanitize_text_field( $_POST['post_type'] ) : '';
+			$post_type = ! empty( $_POST['post_type'] ) ? sanitize_key( wp_unslash( $_POST['post_type'] ) ) : '';
 
 			$category_options = '';
 			if ( $categories = geodir_category_options( $post_type ) ) {
 				foreach ( $categories as $value => $name ) {
-					$category_options .= '<option value="' . $value . '">' . $name . '</option>';
+					$category_options .= '<option value="' . esc_attr( $value ) . '">' . esc_html( $name ) . '</option>';
 				}
 			}
 
 			$sort_by_options = '';
 			if ( $sort_by = geodir_sort_by_options( $post_type ) ) {
 				foreach ( $sort_by as $value => $name ) {
-					$sort_by_options .= '<option value="' . $value . '">' . $name . '</option>';
+					$sort_by_options .= '<option value="' . esc_attr( $value ) . '">' . esc_html( $name ) . '</option>';
 				}
 			}
 

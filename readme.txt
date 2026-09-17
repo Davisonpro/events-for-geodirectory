@@ -73,6 +73,9 @@ To report a security vulnerability, please review our [vulnerability disclosure 
 
 == Changelog ==
 
+= 2.3.33 - 2026-09-TBD =
+* Better sanitation and escaping for event calendar, search and AYI widget - FIXED/SECURITY
+
 = 2.3.32 - 2026-09-02 =
 * Vulnerability Disclosure Policy (VDP) changes in the readme file - ADDED
 

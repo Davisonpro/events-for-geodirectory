@@ -6,6 +6,8 @@
  * @package GeoDirectory_Events
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 function geodir_event_admin_params() {
 	$params = array(
     );
@@ -70,7 +72,7 @@ function geodir_event_inactive_posttype() {
  * @return array
  */
 function geodir_event_filter_schemas( $schemas ) {
-	if ( isset( $_REQUEST['taxonomy'] ) && GeoDir_Taxonomies::supports( sanitize_text_field( $_REQUEST['taxonomy'] ), 'events' ) ) {
+	if ( isset( $_REQUEST['taxonomy'] ) && GeoDir_Taxonomies::supports( sanitize_key( wp_unslash( $_REQUEST['taxonomy'] ) ), 'events' ) ) {
 		$schemas = geodir_event_get_schema_types();
 	}
 	return $schemas;

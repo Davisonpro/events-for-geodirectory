@@ -6,6 +6,8 @@
  * @since 2.0.0.16
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 /**
  * GeoDir_Event_Widget_Schedules class.
  */
@@ -215,8 +217,8 @@ class GeoDir_Event_Widget_Schedules extends WP_Super_Duper {
 			} elseif ( ! empty( $post->start_date ) && $post->ID == $gd_post->ID ) {
 				$date = $post->start_date;
 			} elseif ( geodir_is_page( 'single' ) ) {
-				if ( ! empty( $_REQUEST['gde'] ) ) {
-					$date = sanitize_text_field( $_REQUEST['gde'] );
+				if ( ( $gde = geodir_event_get_gde() ) ) {
+					$date = $gde;
 				} else {
 					$schedules = GeoDir_Event_Schedules::get_schedules( $gd_post->ID, $type, 1 );
 

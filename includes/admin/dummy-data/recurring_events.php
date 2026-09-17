@@ -6,6 +6,8 @@
  * @package GeoDirectory_Event_Manager
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 require_once __DIR__ . '/standard_events.php';
 
 // Recurring options

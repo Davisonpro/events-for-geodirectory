@@ -5,6 +5,9 @@
  *
  * @since 2.0.0
  */
+
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 class GeoDir_Event_Widget_AYI extends WP_Super_Duper {
 
 	public $arguments;

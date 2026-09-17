@@ -9,6 +9,8 @@
  * @version  2.0.0
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 /**
  * Update the terms reviews count for upcoming events.
  * @deprecated

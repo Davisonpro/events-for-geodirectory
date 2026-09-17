@@ -383,7 +383,7 @@ class GeoDir_Event_Post_Type {
 	}
 
 	public static function filter_cpt_settings( $settings, $current_section = '', $post_type_values = array() ) {
-		$post_type = ! empty( $_GET['post_type'] ) ? sanitize_text_field( $_GET['post_type'] ) : '';
+		$post_type = ! empty( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
 
 		if ( ! empty( $settings ) ) {
 			// Events supports setting

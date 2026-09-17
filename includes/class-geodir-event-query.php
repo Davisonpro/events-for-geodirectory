@@ -221,7 +221,7 @@ class GeoDir_Event_Query {
 	}
 
 	public static function posts_where( $where, $query = array() ) {
-		global $geodir_post_type;
+		global $wpdb, $geodir_post_type;
 		
 		if ( ! GeoDir_Query::is_gd_main_query( $query ) ) {
 			return $where;
@@ -237,14 +237,22 @@ class GeoDir_Event_Query {
 
 		if ( geodir_is_page( 'search' ) ) {
 			if ( ! empty( $_REQUEST['event_calendar'] ) ) {
-				$filter_date = sanitize_text_field( $_REQUEST['event_calendar'] );
-				$filter_date = substr( $filter_date, 0, 4 ) . '-' . substr( $filter_date , 4, 2 ) . '-' . substr( $filter_date, 6, 2 );
+				$filter_date = sanitize_text_field( wp_unslash( $_REQUEST['event_calendar'] ) );
 
-				$date_where .= " AND ( start_date = '" . $filter_date . "' OR ( start_date <= '" . $filter_date . "' AND end_date >= '" . $filter_date . "' ) )";
+				// The calendar date is always a plain YYYYMMDD value.
+				if ( preg_match( '/^\d{8}$/', $filter_date ) ) {
+					$filter_date = geodir_event_sanitize_sql_date( substr( $filter_date, 0, 4 ) . '-' . substr( $filter_date, 4, 2 ) . '-' . substr( $filter_date, 6, 2 ) );
+				} else {
+					$filter_date = '';
+				}
+
+				if ( $filter_date !== '' ) {
+					$date_where .= $wpdb->prepare( " AND ( start_date = %s OR ( start_date <= %s AND end_date >= %s ) )", $filter_date, $filter_date, $filter_date );
+				}
 			}
 
 			if ( ! empty( $_REQUEST['event_dates'] ) ) {
-				$event_dates = geodir_event_sanitize_text_field( $_REQUEST['event_dates'] );
+				$event_dates = geodir_event_sanitize_text_field( wp_unslash( $_REQUEST['event_dates'] ) );
 
 				if ( ! is_array( $event_dates ) && ( strpos( $event_dates, ' to ' ) > 0 || strpos( $event_dates, __( ' to ', 'geodirectory' ) ) > 0 ) ) {
 					$_event_dates = strpos( $event_dates, __( ' to ', 'geodirectory' ) ) > 0 ? explode( __( ' to ', 'geodirectory' ), $event_dates, 2 ) : explode( ' to ', $event_dates, 2 );
@@ -259,8 +267,8 @@ class GeoDir_Event_Query {
 				}
 
 				if ( is_array( $event_dates ) ) {
-					$from_date = ! empty( $event_dates['from'] ) ? date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates['from'] ) ) ) : '';
-					$to_date = ! empty( $event_dates['to'] ) ? date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates['to'] ) ) ) : '';
+					$from_date = ! empty( $event_dates['from'] ) ? geodir_event_sanitize_sql_date( date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates['from'] ) ) ) ) : '';
+					$to_date = ! empty( $event_dates['to'] ) ? geodir_event_sanitize_sql_date( date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates['to'] ) ) ) ) : '';
 
 					if ( ! empty( $from_date ) && ! empty( $to_date ) ) {
 						$date_where .= " AND ( ( '{$from_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.start_date BETWEEN '{$from_date}' AND {$schedules_table}.end_date ) ) AND ( ( '{$to_date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) OR ( {$schedules_table}.end_date BETWEEN {$schedules_table}.start_date AND '{$to_date}' ) ) ";
@@ -276,13 +284,16 @@ class GeoDir_Event_Query {
 						}
 					}
 				} else {
-					$date = date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates ) ) );
-					$date_where .= " AND ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ";
+					$date = geodir_event_sanitize_sql_date( date_i18n( 'Y-m-d', strtotime( sanitize_text_field( $event_dates ) ) ) );
+
+					if ( $date !== '' ) {
+						$date_where .= " AND ( '{$date}' BETWEEN {$schedules_table}.start_date AND {$schedules_table}.end_date ) ";
+					}
 				}
 			}
 		}
 
-		$event_type = ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : get_query_var( 'gd_event_type' );
+		$event_type = ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['etype'] ) ) : get_query_var( 'gd_event_type' );
 
 		if ( empty( $event_type ) ) {
 			$event_type = ! empty( $date_where ) ? 'all' : geodir_get_option( 'event_default_filter' );
@@ -382,10 +393,10 @@ class GeoDir_Event_Query {
 			$where .= geodir_location_main_query_posts_where( '', $query, $query->query_vars['post_type'] );
 
 			if ( ! empty( $_REQUEST['my_lat'] ) && ! empty( $_REQUEST['my_lon'] ) ) {
-				$between = geodir_get_between_latlon( sanitize_text_field( $_REQUEST['my_lat'] ), sanitize_text_field( $_REQUEST['my_lon'] ) );
+				$between = geodir_get_between_latlon( geodir_sanitize_float( wp_unslash( $_REQUEST['my_lat'] ), 'lat' ), geodir_sanitize_float( wp_unslash( $_REQUEST['my_lon'] ), 'lng' ) );
 				$where .= $wpdb->prepare( " AND $table.latitude BETWEEN %f AND %f AND $table.longitude BETWEEN %f AND %f ", $between['lat1'], $between['lat2'], $between['lon1'], $between['lon2'] );
 			}
-        }
+		}
 
 		return $where;
 	}
@@ -483,7 +494,7 @@ class GeoDir_Event_Query {
 		if ( ! empty( $request['event_type'] ) ) {
 			$event_type = $request['event_type'];
 		} else if ( ! empty( $_REQUEST['event_type'] ) ) {
-			$event_type = sanitize_text_field( $_REQUEST['event_type'] );
+			$event_type = sanitize_text_field( wp_unslash( $_REQUEST['event_type'] ) );
 		} else {
 			$event_type = geodir_get_option( 'event_map_filter' );
 		}

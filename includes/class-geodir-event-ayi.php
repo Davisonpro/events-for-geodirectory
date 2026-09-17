@@ -87,7 +87,7 @@ class GeoDir_Event_AYI {
 			return false;
 		}
 
-		$gde          = isset( $_GET['gde'] ) ? sanitize_text_field( strip_tags( $_GET['gde'] ) ) : false;
+		$gde          = geodir_event_get_gde();
 		$current_date = date_i18n( 'Y-m-d H:i:s', time() );
 		$schedule     = GeoDir_Event_Schedules::get_upcoming_schedule( $post->ID, $gde, true );
 		if ( empty( $schedule ) ) {
@@ -153,29 +153,42 @@ class GeoDir_Event_AYI {
 
 	public static function ajax_ayi_action() {
 		check_ajax_referer('geodir-ayi-nonce', 'geodir_ayi_nonce');
+
+		// Only logged in users can RSVP.
+		if ( ! get_current_user_id() ) {
+			wp_send_json_error( array( 'message' => __( 'You must be logged in to do that.', 'geodirevents' ) ) );
+		}
+
 		//set variables
-		$action = 'add' === $_POST['btnaction'] ? 'add' : 'remove' ;
-		$type = 'event_rsvp_yes' === $_POST['type'] ? 'event_rsvp_yes' : 'event_rsvp_maybe';
-		$post_id = absint($_POST['postid']);
-		$gde = !empty($_POST['gde']) ? sanitize_key( $_POST['gde'] ) : '';
+		$action  = isset( $_POST['btnaction'] ) && 'add' === $_POST['btnaction'] ? 'add' : 'remove' ;
+		$type    = isset( $_POST['type'] ) && 'event_rsvp_yes' === $_POST['type'] ? 'event_rsvp_yes' : 'event_rsvp_maybe';
+		$post_id = ! empty( $_POST['postid'] ) ? absint( $_POST['postid'] ) : 0;
+		$gde     = ! empty( $_POST['gde'] ) ? geodir_event_get_gde( wp_unslash( $_POST['gde'] ) ) : '';
+
+		// Only allow a RSVP on a published event listing.
+		$rsvp_post = $post_id ? get_post( $post_id ) : null;
+
+		if ( empty( $rsvp_post ) || 'publish' !== $rsvp_post->post_status || ! GeoDir_Post_types::supports( $rsvp_post->post_type, 'events' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid event.', 'geodirevents' ) ) );
+		}
 
         // check we have a date
-		if ( !empty($gde) && !geodir_event_is_date( $gde ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid date provided.', 'geodirectory' ) ) );
+		if ( ! empty( $_POST['gde'] ) && empty( $gde ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid date provided.', 'geodirevents' ) ) );
 		}
 
 		$rsvp_args = array();
-		$rsvp_args['action'] = $action;
-		$rsvp_args['type'] = $type;
+		$rsvp_args['action']  = $action;
+		$rsvp_args['type']    = $type;
 		$rsvp_args['post_id'] = $post_id;
-		$rsvp_args['gde'] = $gde;
+		$rsvp_args['gde']     = $gde;
 
-		self::update_ayi_data($rsvp_args);
-		$post = geodir_get_post_info($post_id);
+		self::update_ayi_data( $rsvp_args );
 
+		$post         = geodir_get_post_info( $post_id );
 		$current_date = date_i18n( 'Y-m-d H:i:s', time() );
-		$gde = !empty($gde) ? sanitize_key( $gde ) : false;
-		$schedule = GeoDir_Event_Schedules::get_start_schedule( $post->ID );
+		$gde          = ! empty( $gde ) ? $gde : false;
+		$schedule     = GeoDir_Event_Schedules::get_start_schedule( $post->ID );
 
 		if ( ! empty( $schedule->all_day ) ) {
 			if ( ! empty( $gde ) ) {
@@ -220,14 +233,14 @@ class GeoDir_Event_AYI {
 					jQuery(this).addClass('disabled');
 					var data = {
 						'action': 'geodir_ayi_action',
-						'geodir_ayi_nonce': '<?php echo $ajax_nonce; ?>',
+						'geodir_ayi_nonce': '<?php echo esc_js( $ajax_nonce ); ?>',
 						'btnaction': btnaction,
 						'type': type,
 						'postid': postid,
 						'gde': gde
 					};
 
-					jQuery.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function (response) {
+					jQuery.post('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', data, function (response) {
                         if( response.success === false){
                             alert(response.data.message);
                         }else{
@@ -505,13 +518,13 @@ class GeoDir_Event_AYI {
 						<?php
 						if ($fimage = geodir_get_featured_image($post->ID, '', true, $post->featured_image)) {
 							?>
-							<a href="<?php echo get_the_permalink($post->ID); ?>">
-								<div class="geodir_thumbnail" style="background-image:url(<?php echo $fimage->src; ?>);"></div>
+							<a href="<?php echo esc_url( get_the_permalink( $post->ID ) ); ?>">
+								<div class="geodir_thumbnail" style="background-image:url(<?php echo esc_url( $fimage->src ); ?>);"></div>
 							</a>
 						<?php } else {
 							?>
-							<a href="<?php echo get_the_permalink($post->ID); ?>">
-								<div class="geodir_thumbnail" style="background-image:url(<?php echo plugin_dir_url( '' ) ?>geodir_ayi/assets/images/no_thumb.png"></div>
+							<a href="<?php echo esc_url( get_the_permalink( $post->ID ) ); ?>">
+								<div class="geodir_thumbnail" style="background-image:url(<?php echo esc_url( plugin_dir_url( '' ) ) ?>geodir_ayi/assets/images/no_thumb.png"></div>
 							</a>
 							<?php
 						} ?>
@@ -520,7 +533,7 @@ class GeoDir_Event_AYI {
 				<div class="event-content-body">
 					<div class="event-content-body-top">
 						<div class="event-title">
-							<a href="<?php echo get_the_permalink($post->ID) ?>"><?php echo get_the_title($post->ID) ?></a>
+							<a href="<?php echo esc_url( get_the_permalink( $post->ID ) ) ?>"><?php echo esc_html( get_the_title( $post->ID ) ) ?></a>
 
 							<div class="event-date">
 								<?php echo self::geodir_ayi_get_event_date_from_post($post); ?>
@@ -529,12 +542,12 @@ class GeoDir_Event_AYI {
 						<div class="event-author">
 							<div class="event-submitted-by">
 								<?php echo __('Submitted by', 'geodirevents'); ?><br/>
-								<a href="<?php echo self::geodir_ayi_get_user_profile_link($user->ID); ?>">
-									<?php echo self::geodir_ayi_member_name(self::geodir_ayi_get_current_user_name($user)); ?>
+								<a href="<?php echo esc_url( self::geodir_ayi_get_user_profile_link( $user->ID ) ); ?>">
+									<?php echo esc_html( self::geodir_ayi_member_name( self::geodir_ayi_get_current_user_name( $user ) ) ); ?>
 								</a>
 							</div>
 							<div class="event-submitted-by-avatar">
-								<a href="<?php echo self::geodir_ayi_get_user_profile_link($user->ID); ?>"><?php echo get_avatar($user->ID, 30); ?></a>
+								<a href="<?php echo esc_url( self::geodir_ayi_get_user_profile_link( $user->ID ) ); ?>"><?php echo get_avatar( $user->ID, 30 ); ?></a>
 							</div>
 
 						</div>
@@ -557,12 +570,12 @@ class GeoDir_Event_AYI {
 							if ($post->rsvp_count > 0) {
 								?>
 								<a href="<?php echo esc_url( $interested_url ); ?>">
-									<?php echo $post->rsvp_count; ?> <?php echo self::geodir_ayi_pluralize($post->rsvp_count, __('is interested', 'geodirevents'), __('are interested', 'geodirevents')); ?>
+									<?php echo (int) $post->rsvp_count; ?> <?php echo esc_html( self::geodir_ayi_pluralize( $post->rsvp_count, __( 'is interested', 'geodirevents' ), __( 'are interested', 'geodirevents' ) ) ); ?>
 								</a>
 								<?php
 							} else {
 								?>
-								<?php echo $post->rsvp_count; ?> <?php echo self::geodir_ayi_pluralize($post->rsvp_count, __('is interested', 'geodirevents'), __('are interested', 'geodirevents')); ?>
+								<?php echo (int) $post->rsvp_count; ?> <?php echo esc_html( self::geodir_ayi_pluralize( $post->rsvp_count, __( 'is interested', 'geodirevents' ), __( 'are interested', 'geodirevents' ) ) ); ?>
 								<?php
 							}
 							?>
@@ -603,16 +616,16 @@ class GeoDir_Event_AYI {
 				$days = array( __('Sunday'), __('Monday'), __('Tuesday'), __('Wednesday'), __('Thursday'), __('Friday'), __('Saturday'));
 
 				if (!empty($event_start_date) && empty($event_end_date)) {
-					$return = '<span class="eve-start-date">' . $event_start_date . '</span><span class="eve-end-date">, ' . $event_start_time . ' - ' . $event_end_time . '</span>';
+					$return = '<span class="eve-start-date">' . esc_html( $event_start_date ) . '</span><span class="eve-end-date">, ' . esc_html( $event_start_time . ' - ' . $event_end_time ) . '</span>';
 				} else {
 					$event_start_date = $days[(int) $event_details['repeat_days'][0]];
 					$event_end_date = $days[(int) end( $event_details['repeat_days'] )];
-					$return = '<span class="eve-start-date">' . $event_start_date . ' to </span><span class="eve-end-date">' . $event_end_date . ', ' . $event_start_time . ' - ' . $event_end_time . '</span>';
+					$return = '<span class="eve-start-date">' . esc_html( $event_start_date ) . ' to </span><span class="eve-end-date">' . esc_html( $event_end_date . ', ' . $event_start_time . ' - ' . $event_end_time ) . '</span>';
 				}
 
 
 			} elseif (isset($event_details['recurring'])) {
-				$gde = isset( $_GET['gde'] ) ? sanitize_key($_GET['gde']) : false;
+				$gde = geodir_event_get_gde();
 
 				if ($gde) {
 					$event_start_date = $event_details['event_start'] ? date('l, F j, Y', strtotime($gde)) : '';
@@ -624,7 +637,7 @@ class GeoDir_Event_AYI {
 		if ( ! empty( $return ) ) {
 			return $return;
 		}
-		return '<span class="eve-start-date">' . $event_start_date . ' ' . $event_start_time . ' - </span><span class="eve-end-date">' . $event_end_date . ' ' . $event_end_time . '</span>';
+		return '<span class="eve-start-date">' . esc_html( $event_start_date . ' ' . $event_start_time ) . ' - </span><span class="eve-end-date">' . esc_html( $event_end_date . ' ' . $event_end_time ) . '</span>';
 	}
 
 	public static function geodir_ayi_get_address_html($post, $review_page = false) {
@@ -635,20 +648,22 @@ class GeoDir_Event_AYI {
 		$zip = isset($post->zip) ? $post->zip : geodir_get_post_meta($post->ID, 'zip', true);
 		$country = isset($post->country) ? $post->country : geodir_get_post_meta($post->ID, 'country', true);
 		$class = $review_page ? 'fsize12' : '';
+		$class = esc_attr( $class );
+
 		if ($street) {
-			$html .= '<span class="'.$class.'">' . stripslashes($street) . '</span><br>';
+			$html .= '<span class="' . $class . '">' . esc_html( stripslashes( $street ) ) . '</span><br>';
 		}
 		if ($city) {
-			$html .= '<span class="'.$class.'">' . $city . '</span>, ';
+			$html .= '<span class="' . $class . '">' . esc_html( $city ) . '</span>, ';
 		}
 		if ($region) {
-			$html .= '<span class="'.$class.'">' . $region . '</span> ';
+			$html .= '<span class="' . $class . '">' . esc_html( $region ) . '</span> ';
 		}
 		if ($zip) {
-			$html .= '<span class="'.$class.'">' . $zip . '</span><br>';
+			$html .= '<span class="' . $class . '">' . esc_html( $zip ) . '</span><br>';
 		}
 		if ($country && !$review_page) {
-			$html .= '<span class="'.$class.'">' . $country . '</span><br>';
+			$html .= '<span class="' . $class . '">' . esc_html( $country ) . '</span><br>';
 		}
 		return apply_filters('geodir_ayi_get_address_html_filter', $html, $post, $class);
 	}

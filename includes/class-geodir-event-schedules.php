@@ -144,10 +144,88 @@ class GeoDir_Event_Schedules {
 		$schedules = apply_filters( 'geodir_event_create_schedules', $schedules, $post_id );
 
 		foreach( $schedules as $schedule ) {
+			$schedule = self::sanitize_schedule( $schedule );
+
+			if ( empty( $schedule ) ) {
+				continue;
+			}
+
 			$wpdb->insert( GEODIR_EVENT_SCHEDULES_TABLE, $schedule, array( '%d', '%s', '%s', '%s', '%s', '%d', '%d' ) );
 		}
 
 		return true;
+	}
+
+	/**
+	 * Sanitize a single event schedule row before it is stored.
+	 *
+	 * @since 2.3.33
+	 *
+	 * @param array $schedule Schedule row.
+	 * @return array Sanitized schedule row, empty array when the row is not valid.
+	 */
+	public static function sanitize_schedule( $schedule ) {
+		if ( ! is_array( $schedule ) || empty( $schedule['event_id'] ) ) {
+			return array();
+		}
+
+		$start_date = geodir_event_sanitize_sql_date( ! empty( $schedule['start_date'] ) ? $schedule['start_date'] : '' );
+
+		if ( $start_date === '' ) {
+			return array();
+		}
+
+		$start_date = substr( $start_date, 0, 10 );
+		$end_date   = geodir_event_sanitize_sql_date( ! empty( $schedule['end_date'] ) ? $schedule['end_date'] : '' );
+		$end_date   = $end_date !== '' ? substr( $end_date, 0, 10 ) : $start_date;
+
+		// Overwrite in place so the column order ( and any column added via filter ) is kept.
+		$schedule['event_id']   = absint( $schedule['event_id'] );
+		$schedule['start_date'] = $start_date;
+		$schedule['end_date']   = $end_date;
+		$schedule['start_time'] = self::sanitize_schedule_time( ! empty( $schedule['start_time'] ) ? $schedule['start_time'] : '' );
+		$schedule['end_time']   = self::sanitize_schedule_time( ! empty( $schedule['end_time'] ) ? $schedule['end_time'] : '' );
+		$schedule['all_day']    = ! empty( $schedule['all_day'] ) ? 1 : 0;
+		$schedule['recurring']  = ! empty( $schedule['recurring'] ) ? 1 : 0;
+
+		return $schedule;
+	}
+
+	/**
+	 * Sanitize an event schedule time value.
+	 *
+	 * @since 2.3.33
+	 *
+	 * @param string $time Time value.
+	 * @return string Time as `H:i:s`, `00:00:00` when the value is not a valid time.
+	 */
+	public static function sanitize_schedule_time( $time ) {
+		if ( ! is_scalar( $time ) ) {
+			return '00:00:00';
+		}
+
+		$time = trim( (string) $time );
+
+		if ( $time === '' ) {
+			return '00:00:00';
+		}
+
+		if ( preg_match( '/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/', $time, $matches ) ) {
+			$hour = (int) $matches[1];
+			$min  = (int) $matches[2];
+			$sec  = isset( $matches[3] ) && $matches[3] !== '' ? (int) $matches[3] : 0;
+
+			if ( $hour <= 23 && $min <= 59 && $sec <= 59 ) {
+				return sprintf( '%02d:%02d:%02d', $hour, $min, $sec );
+			}
+
+			return '00:00:00';
+		}
+
+		// Allow other readable times ( ex: "10:00 AM" ) as long as they parse.
+		$timestamp = strtotime( '1970-01-01 ' . $time . ' UTC' );
+
+		return $timestamp !== false ? gmdate( 'H:i:s', $timestamp ) : '00:00:00';
 	}
 
 	public static function delete_schedules( $post_id, $post_type = '' ) {
@@ -565,7 +643,7 @@ class GeoDir_Event_Schedules {
 			$tz_offset_html = '<div class="geodir-tz-offset text-muted d-inline-block ps-1 pl-1">GMT' . $format_timezone . '</div>';
 			$tz_offset_html	= apply_filters( 'geodir_event_schedule_timezone_offset_html', $tz_offset_html, $format_timezone, $timezone_offset, $_gd_post );
 		}
-		$current			= ! empty( $_REQUEST['gde'] ) ? sanitize_text_field( $_REQUEST['gde'] ) : '';
+		$current			= geodir_event_get_gde();
 		$count = 0;
 
 		$html		= '';
@@ -660,14 +738,21 @@ class GeoDir_Event_Schedules {
 			$alias = GEODIR_EVENT_SCHEDULES_TABLE;
 		}
 
+		// Never allow anything but a plain table name/alias in the SQL.
+		$alias = geodir_event_sanitize_sql_alias( $alias );
+
 		if ( ! empty( $alias ) ) {
 			$alias = $alias . '.';
 		}
 
+		// The dates are concatenated into SQL string literals below, so they must be validated.
+		$date     = geodir_event_sanitize_sql_date( $date );
+		$min_date = geodir_event_sanitize_sql_date( $min_date );
+
 		$now = $date;
 		if ( empty( $date ) ) {
 			$date = date_i18n( 'Y-m-d' );
-			$now = date_i18n( 'Y-m-d H:i:s' );
+			$now  = date_i18n( 'Y-m-d H:i:s' );
 		}
 
 		// Set end of the week
@@ -737,10 +822,10 @@ class GeoDir_Event_Schedules {
 			$filter = '1=1 ';
 
 			// Handle the special between filter where dates are separated by |
-			$dates = explode( '|', strtolower( $event_type ) );
+			$dates = is_scalar( $event_type ) ? explode( '|', strtolower( (string) $event_type ) ) : array();
 
 			// If there are two dates provided...
-			if ( 2 === count( $dates ) ) {
+			if ( 2 === count( $dates ) && geodir_event_is_date( $dates[0] ) && geodir_event_is_date( $dates[1] ) ) {
 				$date1  = date( 'Y-m-d', strtotime( $dates[0] ) );
 				$date2  = date( 'Y-m-d', strtotime( $dates[1] ) );
 				$filter = "( ( {$alias}start_date BETWEEN '" . $date1 . "' AND '" . $date2 . "' ) OR ( {$alias}end_date BETWEEN '" . $date1 . "' AND '" . $date2 . "' ) OR ( '" . $date1 . "' BETWEEN {$alias}start_date AND {$alias}end_date ) OR ( '" . $date2 . "' BETWEEN {$alias}start_date AND {$alias}end_date ) ) ";

@@ -16,7 +16,7 @@
  *
  * @see        https://wpgeodirectory.com/documentation/article/how-tos/customizing-templates/
  * @package    GeoDir_Event_Manager
- * @version    2.3.20
+ * @version    2.3.33
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -34,7 +34,7 @@ foreach ( $event_types as $value => $label ) {
 	if( $event_type == $value ){
 		$button_label = $label;
 	}
-	$options .= '<a href="' . esc_url( $url ) . '" data-etype="' . esc_attr( $value ) . '" class="dropdown-item ' . esc_attr( $active ) . '" rel="nofollow">' . esc_attr( $label ) . '</a>'; 
+	$options .= '<a href="' . esc_url( $url ) . '" data-etype="' . esc_attr( $value ) . '" class="dropdown-item ' . esc_attr( $active ) . '" rel="nofollow">' . esc_html( $label ) . '</a>'; 
 }
 ?>
 <div class="btn-group btn-group-sm geodir-event-filter geodir-loop-event-filter" role="group" aria-label="<?php esc_attr_e("Filter Events","geodirevents");?>">

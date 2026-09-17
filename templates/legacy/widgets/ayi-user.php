@@ -19,7 +19,7 @@
  *
  * @see        https://wpgeodirectory.com/documentation/article/how-tos/customizing-templates/
  * @package    GeoDir_Event_Manager
- * @version    2.1.0.0
+ * @version    2.3.33
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -27,13 +27,13 @@ defined( 'ABSPATH' ) || exit;
 ?>
 <li class="<?php echo esc_attr( $class ); ?>">
 	<div class="item-avatar">
-		<a href="<?php echo GeoDir_Event_AYI::geodir_ayi_get_user_profile_link($user->ID); ?>"><?php echo get_avatar($user->ID, 40); ?></a>
+		<a href="<?php echo esc_url( GeoDir_Event_AYI::geodir_ayi_get_user_profile_link( $user->ID ) ); ?>"><?php echo get_avatar( $user->ID, 40 ); ?></a>
 	</div>
 
 	<div class="item">
 		<div class="item-title">
-			<a href="<?php echo GeoDir_Event_AYI::geodir_ayi_get_user_profile_link($user->ID); ?>">
-				<?php echo GeoDir_Event_AYI::geodir_ayi_member_name(GeoDir_Event_AYI::geodir_ayi_get_current_user_name($user)); ?>
+			<a href="<?php echo esc_url( GeoDir_Event_AYI::geodir_ayi_get_user_profile_link( $user->ID ) ); ?>">
+				<?php echo esc_html( GeoDir_Event_AYI::geodir_ayi_member_name( GeoDir_Event_AYI::geodir_ayi_get_current_user_name( $user ) ) ); ?>
 			</a>
 		</div>
 	</div>
