@@ -6,6 +6,8 @@
  * @package GeoDirectory_Event_Manager
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 function geodir_event_params() {
 	$input_date_format = geodir_event_field_date_format();
 	$display_date_format = geodir_event_date_format();
@@ -99,7 +101,7 @@ function geodir_event_display_event_type_filter( $post_type ) {
 
 	$design_style = geodir_design_style();
 	
-	$event_type 	= ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( $_REQUEST['etype'] ) : ( ! empty( $_REQUEST['event_dates'] ) ? 'all' : geodir_get_option( 'event_default_filter' ) );
+	$event_type 	= ! empty( $_REQUEST['etype'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['etype'] ) ) : ( ! empty( $_REQUEST['event_dates'] ) ? 'all' : geodir_get_option( 'event_default_filter' ) );
 	$current_url 	= str_replace( '#038;', '&', geodir_curPageURL() );
 	
 	//Search and remove the current page number from url
@@ -218,7 +220,7 @@ function geodir_event_get_replacements() {
 	}
 
 	if ( ! empty( $_REQUEST['etype'] ) ) {
-		$event_type_archive = geodir_event_type_title( sanitize_text_field( $_REQUEST['etype'] ) );
+		$event_type_archive = geodir_event_type_title( sanitize_text_field( wp_unslash( $_REQUEST['etype'] ) ) );
 	}
 	
 	if ( ! empty( $gd_post ) && is_single() && GeoDir_Post_types::supports( $gd_post->post_type, 'events' ) ) {
@@ -226,8 +228,8 @@ function geodir_event_get_replacements() {
 		$time_format = geodir_event_time_format();
 
 		if ( ! empty( $gd_post->recurring ) ) { // Recurring event
-			if ( ! empty( $_REQUEST['gde'] ) ) {
-				$schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, sanitize_text_field( $_REQUEST['gde'] ) );
+			if ( ( $gde = geodir_event_get_gde() ) ) {
+				$schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, $gde );
 			} else {
 				if ( ! ( $schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, date_i18n( 'Y-m-d' ) ) ) ) {
 					$schedule = GeoDir_Event_Schedules::get_start_schedule( $gd_post->ID );
@@ -319,7 +321,7 @@ function geodir_event_filter_searched_params( $params = array(), $post_type = ''
 		$sublabel_class .= ' mb-0 c-pointer ' . ( $aui_bs5 ? 'me-1' : 'mr-1' );
 	}
 
-	$event_date = !empty( $_REQUEST['event_date'] ) ? sanitize_text_field( $_REQUEST['event_date'] ) : '';
+	$event_date = ! empty( $_REQUEST['event_date'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['event_date'] ) ) : '';
 
 	if ( $event_date ) {
 		$params[] = '<label class="' . $label_class . ' gd-adv-search-date gd-adv-search-event_date" data-name="event_date"><i class="fas fa-calendar-alt" aria-hidden="true"></i> <label class="' . $sublabel_class . '">' . $frontend_title . ': </label>' . date_i18n( $geodir_date_format, strtotime( $event_date ) ) . '</label>';
@@ -328,7 +330,7 @@ function geodir_event_filter_searched_params( $params = array(), $post_type = ''
 	if ( ! empty( $_REQUEST['event_dates'] ) ) {
 		$date_format = geodir_event_date_format();
 
-		$event_dates = geodir_event_sanitize_text_field( $_REQUEST['event_dates'] );
+		$event_dates = geodir_event_sanitize_text_field( wp_unslash( $_REQUEST['event_dates'] ) );
 
 		// Date range
 		if ( ! is_array( $event_dates ) && ( strpos( $event_dates, ' to ' ) > 0 || strpos( $event_dates, __( ' to ', 'geodirectory' ) ) > 0 ) ) {
@@ -455,8 +457,10 @@ function geodir_event_title_recurring_event( $title, $post_id = null ) {
 				$title .= "<span class='gd-date-in-title'> " . wp_sprintf( __( '- %s', 'geodirevents' ), date_i18n( $geodir_date_format, strtotime( $event_post->start_date ) ) ) . "</span>";
 			}
 		} else {
-			if ( is_single() && isset( $_REQUEST['gde'] ) && geodir_event_is_date( sanitize_text_field( $_REQUEST['gde'] ) ) && GeoDir_Event_Schedules::has_schedule( $post_id, sanitize_text_field( $_REQUEST['gde'] ) ) ) {
-				$title .= "<span class='gd-date-in-title'> " . wp_sprintf( __( '- %s', 'geodirevents' ), date_i18n( $geodir_date_format, strtotime( sanitize_text_field( $_REQUEST['gde'] ) ) ) ) . "</span>";
+			$gde = geodir_event_get_gde();
+
+			if ( is_single() && $gde !== '' && GeoDir_Event_Schedules::has_schedule( $post_id, $gde ) ) {
+				$title .= "<span class='gd-date-in-title'> " . wp_sprintf( __( '- %s', 'geodirevents' ), esc_html( date_i18n( $geodir_date_format, strtotime( $gde ) ) ) ) . "</span>";
 			}
 		}
 	}

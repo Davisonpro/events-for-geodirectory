@@ -120,6 +120,99 @@ function geodir_event_is_date( $date ) {
 	return false;
 }
  
+/**
+ * Sanitize a date/datetime value that is used inside a SQL condition.
+ *
+ * Only well formed `Y-m-d` / `Y-m-d H:i:s` values are allowed.
+ *
+ * @since 2.3.33
+ *
+ * @param string $date     Date to sanitize.
+ * @param string $fallback Value returned when $date is not a valid date.
+ * @return string Sanitized date or the fallback value.
+ */
+function geodir_event_sanitize_sql_date( $date, $fallback = '' ) {
+	if ( ! is_scalar( $date ) ) {
+		return $fallback;
+	}
+
+	$date = trim( (string) $date );
+
+	if ( $date === '' ) {
+		return $fallback;
+	}
+
+	// Y-m-d or Y-m-d H:i(:s)
+	if ( ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/', $date, $matches ) ) {
+		return $fallback;
+	}
+
+	if ( ! checkdate( (int) $matches[2], (int) $matches[3], (int) $matches[1] ) ) {
+		return $fallback;
+	}
+
+	$sanitized = sprintf( '%04d-%02d-%02d', $matches[1], $matches[2], $matches[3] );
+
+	if ( isset( $matches[4] ) && $matches[4] !== '' ) {
+		$hour = (int) $matches[4];
+		$min = (int) $matches[5];
+		$sec = isset( $matches[6] ) && $matches[6] !== '' ? (int) $matches[6] : 0;
+
+		if ( $hour > 23 || $min > 59 || $sec > 59 ) {
+			return $fallback;
+		}
+
+		$sanitized .= sprintf( ' %02d:%02d:%02d', $hour, $min, $sec );
+	}
+
+	return $sanitized;
+}
+
+/**
+ * Sanitize a table name / table alias used in a SQL statement.
+ *
+ * @since 2.3.33
+ *
+ * @param string $alias Table name or alias.
+ * @return string Sanitized table name or alias, empty string when invalid.
+ */
+function geodir_event_sanitize_sql_alias( $alias ) {
+	if ( ! is_scalar( $alias ) ) {
+		return '';
+	}
+
+	$alias = trim( (string) $alias );
+
+	if ( $alias === '' ) {
+		return '';
+	}
+
+	return preg_match( '/^[A-Za-z0-9_]+$/', $alias ) ? $alias : '';
+}
+
+/**
+ * Sanitize the `gde` ( recurring event schedule date ) request parameter.
+ *
+ * @since 2.3.33
+ *
+ * @param string $gde Optional. Raw value. Default the value from the request.
+ * @return string Valid `Y-m-d` date or empty string.
+ */
+function geodir_event_get_gde( $gde = null ) {
+	if ( $gde === null ) {
+		$gde = isset( $_REQUEST['gde'] ) ? wp_unslash( $_REQUEST['gde'] ) : '';
+	}
+
+	if ( ! is_scalar( $gde ) ) {
+		return '';
+	}
+
+	$gde = geodir_event_sanitize_sql_date( sanitize_text_field( $gde ) );
+
+	// Only the date part is ever used for schedules.
+	return $gde !== '' ? substr( $gde, 0, 10 ) : '';
+}
+
 function geodir_event_is_recurring_active() {
 	if ( geodir_get_option( 'event_disable_recurring' ) ) {
 		$active = false;
@@ -251,8 +344,8 @@ function geodir_event_schema( $schema, $post ) {
 
 		if ( GeoDir_Post_types::supports( $gd_post->post_type, 'events' ) ) {
 			if ( ! empty( $gd_post->recurring ) ) { // Recurring event
-				if ( ! empty( $_REQUEST['gde'] ) ) {
-					$schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, sanitize_text_field( $_REQUEST['gde'] ) );
+				if ( ( $gde = geodir_event_get_gde() ) ) {
+					$schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, $gde );
 				} else {
 					if ( ! ( $schedule = GeoDir_Event_Schedules::get_upcoming_schedule( $gd_post->ID, date_i18n( 'Y-m-d' ) ) ) ) {
 						$schedule = GeoDir_Event_Schedules::get_start_schedule( $gd_post->ID );

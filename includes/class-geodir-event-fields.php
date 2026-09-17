@@ -347,11 +347,11 @@ class GeoDir_Event_Fields {
 		}else{
 			?>
 			<div id="<?php echo esc_attr( $htmlvar_name ); ?>_row" class="required_field geodir_form_row clearfix gd-fieldset-details geodir-event-field">
-				<label><?php echo $field_title . ' <span>*</span>'; ?></label>
+				<label><?php echo esc_html( $field_title ) . ' <span>*</span>'; ?></label>
 				<span class="gd-radios"><input name="<?php echo esc_attr( $htmlvar_name ); ?>" id="<?php echo esc_attr( $htmlvar_name ); ?>" <?php checked( (int) $value, 1 ); ?> value="1" class="gd-checkbox" field_type="radio" type="radio" /><?php echo __( 'Yes', 'geodirevents' ); ?></span>
 				<span class="gd-radios"><input name="<?php echo esc_attr( $htmlvar_name ); ?>" id="<?php echo esc_attr( $htmlvar_name ); ?>" <?php checked( (int) $value, 0 ); ?> value="0" class="gd-checkbox" field_type="radio" type="radio" /><?php echo __( 'No', 'geodirevents' ); ?></span>
-				<span class="geodir_message_note"><?php echo $field_desc; ?></span>
-				<span class="geodir_message_error"><?php echo $required_msg; ?></span>
+				<span class="geodir_message_note"><?php echo esc_html( $field_desc ); ?></span>
+				<span class="geodir_message_error"><?php echo esc_html( $required_msg ); ?></span>
 			</div>
 			<?php
 		}
@@ -825,7 +825,7 @@ class GeoDir_Event_Fields {
 	        ?>
 			<?php if ( $description != '' ) { ?>
 			<div id="geodir_event_date_desc_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field">
-				<span class="geodir_message_note"><?php echo $description; ?></span>
+				<span class="geodir_message_note"><?php echo esc_html( $description ); ?></span>
 			</div>
 			<?php } ?>
 	        <div id="geodir_event_start_date_row" class="required_field geodir_form_row clearfix gd-fieldset-details geodir-event-field">
@@ -838,20 +838,20 @@ class GeoDir_Event_Fields {
 				<input type="text" class="geodir_textfield geodir-w200" name="<?php echo esc_attr( $htmlvar_name ); ?>[end_date]" id="event_end_date" value="<?php echo esc_attr( $end_date ); ?>" field_type="text"  <?php echo ( wp_is_mobile() ) ?  'readonly="readonly"' : '';?>>
 	        </div>
 			<?php if ( $is_recurring_active ) { ?>
-			<div id="geodir_event_duration_x_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_duration_x_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_duration_x"><?php echo __( 'Event duration (days)', 'geodirevents' ); ?></label>
 				<input type="number" class="geodir_textfield geodir-w200" name="<?php echo esc_attr( $htmlvar_name ); ?>[duration_x]" id="event_duration_x" value="<?php echo esc_attr( $duration_x ); ?>" min="0" lang="EN" field_type="text">
 	        </div>
-			<div id="geodir_event_repeat_x_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_repeat_x_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_repeat_x"><?php echo __( 'Repeats every', 'geodirevents' ); ?></label>
 				<select id="event_repeat_x" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_x]" class="geodir_textfield geodir-select geodir-w200">
 					<?php for ( $i = 1; $i <= 30; $i++ ) { ?>
-					<option value="<?php echo $i;?>" <?php selected( $repeat_x, $i ); ?>><?php echo $i;?></option>
+					<option value="<?php echo (int) $i;?>" <?php selected( $repeat_x, $i ); ?>><?php echo (int) $i;?></option>
 					<?php } ?>
 				</select>
 				<span class="geodir_message_error"><?php _e( 'Please select recurring interval', 'geodirevents' );?></span>
 	        </div>
-			<div id="geodir_event_repeat_type_row" class="required_field geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_repeat_type_row" class="required_field geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_repeat_type"><?php echo __( 'Repeats', 'geodirevents' ) . ' <span>*</span>'; ?></label>
 				<select id="event_repeat_type" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_type]" class="geodir_textfield geodir-select geodir-w200" data-placeholder="<?php echo esc_attr_e( 'Select recurring type', 'geodirevents' );?>">
 					<option value="" <?php selected( $repeat_type, '' );?>><?php _e( 'Select recurring type', 'geodirevents' );?></option>
@@ -863,7 +863,7 @@ class GeoDir_Event_Fields {
 				</select>
 				<span class="geodir_message_error"><?php _e( 'Please select recurring type', 'geodirevents' );?></span>
 	        </div>
-			<div id="geodir_event_repeat_days_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_repeat_days_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_repeat_days"><?php echo __( 'Repeat on', 'geodirevents' ); ?></label>
 				<select id="event_repeat_days" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_days][]" class="geodir_textfield geodir-select" multiple="multiple" data-placeholder="<?php echo esc_attr_e( 'Select days', 'geodirevents' );?>">
 					<option value="1" <?php selected( true, in_array( 1, $repeat_days ) ); ?>><?php _e( 'Mon' ); ?></option>
@@ -875,7 +875,7 @@ class GeoDir_Event_Fields {
 					<option value="0" <?php selected( true, in_array( 0, $repeat_days ) ); ?>><?php _e( 'Sun' ); ?></option>
 				</select>
 	        </div>
-			<div id="geodir_event_repeat_weeks_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_repeat_weeks_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_repeat_weeks"><?php echo __( 'Repeat by', 'geodirevents' ); ?></label>
 				<select id="event_repeat_weeks" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_weeks][]" class="geodir_textfield geodir-select" multiple="multiple" data-placeholder="<?php echo esc_attr_e( 'Select weeks', 'geodirevents' );?>">
 					<option value="1" <?php selected( true, in_array( 1, $repeat_weeks ) ); ?>><?php _e( '1st week', 'geodirevents' ); ?></option>
@@ -886,19 +886,19 @@ class GeoDir_Event_Fields {
 					<option value="last" <?php selected( true, in_array( 'last', $repeat_weeks ) ); ?>><?php _e( 'Last week', 'geodirevents' ); ?></option>
 				</select>
 	        </div>
-			<div id="geodir_event_recurring_ends_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_recurring_ends_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label><?php echo __( 'Stop Recurring Events', 'geodirevents' ); ?></label>
 				<div class="geodir-inline-fields">
-					<input type="radio" class="gd-checkbox" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end_type]" id="event_repeat_end_type_m" value="0" <?php checked( $repeat_end_type, 0 );?> /><label for="event_repeat_end_type_m"><?php _e( 'After', 'geodirevents' );?></label>&nbsp;<input type="number" value="<?php echo $max_repeat;?>" class="geodir_textfield geodir-w110" id="event_max_repeat" name="<?php echo esc_attr( $htmlvar_name ); ?>[max_repeat]" lang="EN">&nbsp;<label for="event_repeat_end_type_m"><?php _e( 'occurrences', 'geodirevents' );?></label>&nbsp;&nbsp;<input type="radio" class="gd-checkbox" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end_type]" id="event_repeat_end_type_u" value="1" <?php checked( $repeat_end_type, 1 );?> /><label for="event_repeat_end_type_u"><?php _e( 'On', 'geodirevents' );?></label> <input type="text" value="<?php echo $repeat_end;?>" class="geodir_textfield geodir-w200" id="event_repeat_end" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end]" />
+					<input type="radio" class="gd-checkbox" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end_type]" id="event_repeat_end_type_m" value="0" <?php checked( $repeat_end_type, 0 );?> /><label for="event_repeat_end_type_m"><?php _e( 'After', 'geodirevents' );?></label>&nbsp;<input type="number" value="<?php echo esc_attr( $max_repeat );?>" class="geodir_textfield geodir-w110" id="event_max_repeat" name="<?php echo esc_attr( $htmlvar_name ); ?>[max_repeat]" lang="EN">&nbsp;<label for="event_repeat_end_type_m"><?php _e( 'occurrences', 'geodirevents' );?></label>&nbsp;&nbsp;<input type="radio" class="gd-checkbox" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end_type]" id="event_repeat_end_type_u" value="1" <?php checked( $repeat_end_type, 1 );?> /><label for="event_repeat_end_type_u"><?php _e( 'On', 'geodirevents' );?></label> <input type="text" value="<?php echo esc_attr( $repeat_end );?>" class="geodir_textfield geodir-w200" id="event_repeat_end" name="<?php echo esc_attr( $htmlvar_name ); ?>[repeat_end]" />
 				</div>
 				<span class="geodir_message_note"><?php _e( 'Event will stop recurring after this number of instances / this date.', 'geodirevents' );?></span>
 	        </div>
-			<div id="geodir_event_custom_recurring_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_custom_recurring_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 				<label><?php echo __( 'Event Date(s)', 'geodirevents' ); ?></label>
 				<div id="event_yui_calendar" class="yui-skin-sam yui-t2">
 					<div class="fullitem">
 						<div id="geodir_event_selected_dates_row_c" class="yui-panel-container shadow">
-							<div id="geodir_event_selected_dates_row" class="popup yui-module yui-overlay yui-panel" style="<?php echo $custom_recurring_class; ?>">
+							<div id="geodir_event_selected_dates_row" class="popup yui-module yui-overlay yui-panel" style="<?php echo esc_attr( $custom_recurring_class ); ?>">
 								<div id="geodir_event_selected_dates_row_h" class="hd">
 									<?php _e( 'Selected Dates', 'geodirevents' );?>
 								</div>
@@ -913,7 +913,7 @@ class GeoDir_Event_Fields {
 							<div class="yui-calcontainer groupcal first-of-type" id="geodir_event_multi_dates_cal_0"></div>
 							<div class="yui-calcontainer groupcal last-of-type" id="geodir_event_multi_dates_cal_1"></div>
 						</div>
-						<input name="<?php echo esc_attr( $htmlvar_name ); ?>[recurring_dates]" id="event_recurring_dates" value="<?php echo $recurring_dates; ?>" type="hidden">
+						<input name="<?php echo esc_attr( $htmlvar_name ); ?>[recurring_dates]" id="event_recurring_dates" value="<?php echo esc_attr( $recurring_dates ); ?>" type="hidden">
 						<span style="display:none!important;height:0;width:0" id="geodir_event_default_dates"><?php echo $custom_dates_list; ?></span>
 						<span style="display:none!important;height:0;width:0" id="geodir_event_start_time_options"><?php echo geodir_event_time_options( ( ! empty( $start_time ) ? $start_time : '10:00' ) ); ?></span>
 						<span style="display:none!important;height:0;width:0" id="geodir_event_end_time_options"><?php echo geodir_event_time_options( ( ! empty( $end_time ) ? $end_time : '18:00' ) ); ?></span>
@@ -929,7 +929,7 @@ class GeoDir_Event_Fields {
 	            <input value="1" id="event_all_day_chk" class="gd-checkbox" field_type="checkbox" type="checkbox" <?php checked( $all_day, 1 ); ?> onchange="if(this.checked){jQuery('#event_all_day').val('1');} else{ jQuery('#event_all_day').val('0');}" />
 				<span class="geodir_message_note"><?php _e( 'Tick to set event for all day.', 'geodirevents' ); ?></span>
 	        </div>
-			<div id="geodir_event_time_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $show_time_class; ?>">
+			<div id="geodir_event_time_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $show_time_class ); ?>">
 	            <label for="event_start_time"><?php echo __( 'Event Time', 'geodirevents' ); ?></label>
 				<div class="geodir-inline-fields">
 					<label for="event_start_time" class="lbl-event-start-time"><?php _e( 'Starts at', 'geodirevents' ); ?></label>
@@ -943,13 +943,13 @@ class GeoDir_Event_Fields {
 				</div>
 	        </div>
 			<?php if ( $is_recurring_active ) { ?>
-			<div id="geodir_event_different_times_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $recurring_class; ?>">
+			<div id="geodir_event_different_times_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $recurring_class ); ?>">
 	            <label for="event_different_times_chk"><?php echo __( 'Different Event Times?', 'geodirevents' ); ?></label>
 	            <input type="hidden" name="<?php echo esc_attr( $htmlvar_name ); ?>[different_times]" id="event_different_times" value="<?php echo (int)$different_times; ?>"/>
 	            <input value="1" id="event_different_times_chk" class="gd-checkbox" field_type="checkbox" type="checkbox" <?php checked( $different_times, 1 ); ?> onchange="if(this.checked){jQuery('#event_different_times').val('1');} else{ jQuery('#event_different_times').val('0');}" />
 				<span class="geodir_message_note"><?php _e( 'Tick to set separate start and end times for each date.', 'geodirevents' ); ?></span>
 	        </div>
-			<div id="geodir_event_times_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo $show_times_class; ?>">
+			<div id="geodir_event_times_row" class="geodir_form_row clearfix gd-fieldset-details geodir-event-field <?php echo esc_attr( $show_times_class ); ?>">
 				<label></label>
 				<div class="show_different_times_div"><?php echo $different_times_list; ?></div>
 			</div>
@@ -1439,7 +1439,7 @@ class GeoDir_Event_Fields {
 
 		$pt_name = geodir_post_type_singular_name( $post_type, true );
 		$htmlvar_name = $cf->htmlvar_name;
-		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( $_REQUEST[ $htmlvar_name ] ) : '';
+		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( wp_unslash( $_REQUEST[ $htmlvar_name ] ) ) : '';
 		$field_label = $cf->frontend_title ? stripslashes( __( $cf->frontend_title, 'geodirectory' ) ) : '';
 
 		$date_format = geodir_event_date_format();
@@ -1469,10 +1469,10 @@ class GeoDir_Event_Fields {
 			$field_label_from = ! empty( $field_label ) ? wp_sprintf( __( 'From: %s', 'geodirevents' ), $field_label ) : wp_sprintf( __( '%s Start Date', 'geodirevents' ), $pt_name );
 			$field_label_to = ! empty( $field_label ) ? wp_sprintf( __( 'To: %s', 'geodirevents' ), $field_label ) : wp_sprintf( __( '%s End Date', 'geodirevents' ), $pt_name );
 			?>
-			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo $htmlvar_name; ?>-from">
+			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?>-from">
 				<input type="text" value="<?php echo esc_attr( $field_value_from_display ); ?>" placeholder="<?php echo esc_attr( $field_label_from ); ?>" class="cat_input gd-search-date-input" field_type="text" data-alt-field="<?php echo esc_attr( $htmlvar_name ); ?>[from]" data-date-format="<?php echo esc_attr( $jqueryui_date_format ); ?>" data-alt-format="<?php echo esc_attr( geodir_date_format_php_to_jqueryui( 'Y-m-d' ) ); ?>" data-field-key="<?php echo esc_attr( $htmlvar_name ); ?>" aria-label="<?php echo esc_attr( $field_label_from ); ?>"/><input type="hidden" name="<?php echo esc_attr( $htmlvar_name ); ?>[from]" value="<?php echo esc_attr( $field_value_from ); ?>">
 			</div>
-			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo $htmlvar_name; ?>-to">
+			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?>-to">
 				<input type="text" value="<?php echo esc_attr( $field_value_to_display ); ?>" placeholder="<?php echo esc_attr( $field_label_to ); ?>" class="cat_input gd-search-date-input" field_type="text" data-alt-field="<?php echo esc_attr( $htmlvar_name ); ?>[to]" data-date-format="<?php echo esc_attr( $jqueryui_date_format ); ?>"  data-alt-format="<?php echo esc_attr( geodir_date_format_php_to_jqueryui( 'Y-m-d' ) ); ?>" data-field-key="<?php echo esc_attr( $htmlvar_name ); ?>" aria-label="<?php echo esc_attr( $field_label_to ); ?>"/><input type="hidden" name="<?php echo esc_attr( $htmlvar_name ); ?>[to]" value="<?php echo esc_attr( $field_value_to ); ?>">
 			</div>
 			<?php
@@ -1483,7 +1483,7 @@ class GeoDir_Event_Fields {
 			$field_value = ! empty( $event_dates ) && ! is_array( $event_dates ) ? sanitize_text_field( $event_dates ) : '';
 			$field_value_display = ! empty( $field_value ) ? date_i18n( $date_format, strtotime( $field_value ) ) : '';
 			?>
-			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo $htmlvar_name; ?>">
+			<div class="gd-search-input-wrapper gd-search-field-cpt gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?>">
 				<input type="text" value="<?php echo esc_attr( $field_value_display ); ?>" placeholder="<?php echo esc_attr( $field_label ); ?>" class="cat_input gd-search-date-input" field_type="text" data-alt-field="<?php echo esc_attr( $htmlvar_name ); ?>" data-date-format="<?php echo esc_attr( $jqueryui_date_format ); ?>"  data-alt-format="<?php echo esc_attr( geodir_date_format_php_to_jqueryui( 'Y-m-d' ) ); ?>" data-field-key="<?php echo esc_attr( $htmlvar_name ); ?>" aria-label="<?php echo esc_attr( $field_label ); ?>"><input type="hidden" name="<?php echo esc_attr( $htmlvar_name ); ?>" value="<?php echo esc_attr( $field_value ); ?>">
 			</div>
 			<?php			
@@ -1503,7 +1503,7 @@ class GeoDir_Event_Fields {
 
 		$pt_name = geodir_post_type_singular_name( $post_type, true );
 		$htmlvar_name = $cf->htmlvar_name;
-		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( $_REQUEST[ $htmlvar_name ] ) : '';
+		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( wp_unslash( $_REQUEST[ $htmlvar_name ] ) ) : '';
 		$field_label = $cf->frontend_title ? stripslashes( __( $cf->frontend_title, 'geodirectory' ) ) : '';
 
 		$date_format = geodir_event_date_format();
@@ -1520,7 +1520,7 @@ class GeoDir_Event_Fields {
 				$field_label = wp_sprintf( __( '%s Dates', 'geodirevents' ), $pt_name );
 			}
 			?>
-			<div class="gd-search-has-date gd-search-<?php echo $htmlvar_name; ?> from-to col-auto flex-fill<?php echo ( $aui_bs5 ? ' px-0' : '' ); ?>"<?php echo $wrap_attrs; ?>>
+			<div class="gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?> from-to col-auto flex-fill<?php echo ( $aui_bs5 ? ' px-0' : '' ); ?>"<?php echo $wrap_attrs; ?>>
 				<?php if ( ! empty( $field_label ) ) { ?>
 					<label for="<?php echo esc_attr( $htmlvar_name ); ?>" class="sr-only visually-hidden"><?php echo $field_label; ?></label>
 				<?php }
@@ -1556,7 +1556,7 @@ class GeoDir_Event_Fields {
 			$event_dates = ! empty( $event_dates ) && ! is_array( $event_dates ) ? sanitize_text_field( $event_dates ) : '';
 
 			?>
-			<div class="gd-search-has-date gd-search-<?php echo $htmlvar_name; ?> col-auto flex-fill<?php echo ( $aui_bs5 ? ' px-0' : '' ); ?>"<?php echo $wrap_attrs; ?>>
+			<div class="gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?> col-auto flex-fill<?php echo ( $aui_bs5 ? ' px-0' : '' ); ?>"<?php echo $wrap_attrs; ?>>
 				<?php if ( ! empty( $field_label ) ) { ?>
 					<label for="<?php echo esc_attr( $htmlvar_name ); ?>" class="sr-only visually-hidden"><?php echo $field_label; ?></label>
 				<?php }
@@ -1602,7 +1602,7 @@ class GeoDir_Event_Fields {
 
 		$pt_name = geodir_post_type_singular_name( $post_type, true );
 		$htmlvar_name = $cf->htmlvar_name;
-		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( $_REQUEST[ $htmlvar_name ] ) : NULL;
+		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( wp_unslash( $_REQUEST[ $htmlvar_name ] ) ) : NULL;
 		$field_label = $cf->frontend_title ? stripslashes( __( $cf->frontend_title, 'geodirectory' ) ) : '';
 
 		$date_format = geodir_event_date_format();
@@ -1613,7 +1613,7 @@ class GeoDir_Event_Fields {
 		$html .= GeoDir_Adv_Search_Fields::field_wrapper_start( $cf );
 
 		ob_start();
-		?><li class="gd-search-row-<?php echo $htmlvar_name; ?>"><?php
+		?><li class="gd-search-row-<?php echo esc_attr( $htmlvar_name ); ?>"><?php
 		if ( $cf->search_condition == 'FROM' ) {
 			$field_value_from = '';
 			$field_value_to = '';
@@ -1640,7 +1640,7 @@ class GeoDir_Event_Fields {
 			$aria_label_from = empty( $as_fieldset_start ) ? ' aria-label="' . esc_attr( $field_label_from ) . '"' : '';
 			$aria_label_to = empty( $as_fieldset_start ) ? ' aria-label="' . esc_attr( $field_label_to ) . '"' : '';
 			?>
-			<div class="gd-search-has-date gd-search-<?php echo $htmlvar_name; ?> from-to">
+			<div class="gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?> from-to">
 				<?php if ( ! empty( $as_fieldset_start ) ) { ?>
 					<label for="<?php echo esc_attr( $htmlvar_name ); ?>_from"><?php echo $field_label; ?></label>
 				<?php } ?>
@@ -1657,7 +1657,7 @@ class GeoDir_Event_Fields {
 			$field_value = ! empty( $event_dates ) && ! is_array( $event_dates ) ? sanitize_text_field( $event_dates ) : '';
 			$field_value_display = ! empty( $field_value ) ? date_i18n( $date_format, strtotime( $field_value ) ) : '';
 			?>
-			<div class="gd-search-has-date gd-search-<?php echo $htmlvar_name; ?>">
+			<div class="gd-search-has-date gd-search-<?php echo esc_attr( $htmlvar_name ); ?>">
 				<?php if ( ! empty( $as_fieldset_start ) ) { ?>
 					<label for="<?php echo esc_attr( $htmlvar_name ); ?>"><?php echo $field_label; ?></label>
 				<?php } ?>
@@ -1683,7 +1683,7 @@ class GeoDir_Event_Fields {
 
 		$pt_name = geodir_post_type_singular_name( $post_type, true );
 		$htmlvar_name = $cf->htmlvar_name;
-		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( $_REQUEST[ $htmlvar_name ] ) : NULL;
+		$event_dates = isset( $_REQUEST[ $htmlvar_name ] ) ? geodir_event_sanitize_text_field( wp_unslash( $_REQUEST[ $htmlvar_name ] ) ) : NULL;
 		$field_label = $cf->frontend_title ? stripslashes( __( $cf->frontend_title, 'geodirectory' ) ) : '';
 
 		$date_format = geodir_event_date_format();
@@ -2318,7 +2318,7 @@ class GeoDir_Event_Fields {
 	 */
 	public static function search_form_inputs( $args ) {
 		if ( ! empty( $_REQUEST['event_calendar'] ) && geodir_is_page( 'search' ) ) {
-			echo '<input type="hidden" name="event_calendar" value="' . esc_attr( $_REQUEST['event_calendar'] ) . '">';
+			echo '<input type="hidden" name="event_calendar" value="' . esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['event_calendar'] ) ) ) . '">';
 		}
 	}
 }

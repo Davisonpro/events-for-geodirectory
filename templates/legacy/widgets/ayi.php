@@ -19,7 +19,7 @@
  *
  * @see        https://wpgeodirectory.com/documentation/article/how-tos/customizing-templates/
  * @package    GeoDir_Event_Manager
- * @version    2.1.0.0
+ * @version    2.3.33
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -60,7 +60,7 @@ if ( $buttons ) {
 <?php } ?>
 <div class="geodir-ayi-wid geodir-ayi-whois-in">
 	<h3 class="geodir-ayi-section-title"><?php echo __('Who\'s in?', 'geodirevents'); ?>
-		<span><?php echo wp_sprintf( _n( '1 response', '%s responses', $count['yes'], 'geodirevents'), $count['yes'] ); ?></span></h3>
+		<span><?php echo esc_html( wp_sprintf( _n( '1 response', '%s responses', $count['yes'], 'geodirevents'), $count['yes'] ) ); ?></span></h3>
 	<?php if ($count['yes'] > 0) { ?>
 		<ul class="geodir-ayi-item-list geodir-ayi-list-users">
 			<?php GeoDir_Event_AYI::geodir_ayi_rsvp_users_for_a_post( $post->ID, "event_rsvp_yes", $no_of_users, $gde ); ?>
@@ -73,7 +73,7 @@ if ( $buttons ) {
 </div>
 <div class="geodir-ayi-wid">
 	<h3 class="geodir-ayi-section-title"><?php echo __('Sounds Cool', 'geodirevents'); ?>
-		<span><?php echo wp_sprintf(_n('1 response', '%s responses', $count['maybe'], 'geodirevents'), $count['maybe'] ); ?></span></h3>
+		<span><?php echo esc_html( wp_sprintf(_n('1 response', '%s responses', $count['maybe'], 'geodirevents'), $count['maybe'] ) ); ?></span></h3>
 	<?php if ($count['maybe'] > 0) { ?>
 		<ul class="geodir-ayi-item-list geodir-ayi-list-users">
 			<?php GeoDir_Event_AYI::geodir_ayi_rsvp_users_for_a_post( $post->ID, "event_rsvp_maybe", $no_of_users, $gde ); ?>

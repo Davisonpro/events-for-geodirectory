@@ -8,6 +8,8 @@
  * @subpackage Events_For_Geodirectory/includes
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 /**
  * Fired during plugin activation/deactivation.
  *

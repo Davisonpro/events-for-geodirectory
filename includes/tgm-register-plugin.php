@@ -17,6 +17,8 @@
  * @link       https://github.com/TGMPA/TGM-Plugin-Activation
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 /**
  * Include the TGM_Plugin_Activation class.
  *

@@ -6,6 +6,8 @@
  * @package GeoDirectory_Event_Manager
  */
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 global $dummy_image_url, $dummy_categories, $dummy_custom_fields, $dummy_posts, $dummy_sort_fields;
 
 $dummy_image_url = 'https://ayecode.b-cdn.net/dummy/';

@@ -19,7 +19,7 @@
  *
  * @see        https://wpgeodirectory.com/documentation/article/how-tos/customizing-templates/
  * @package    GeoDir_Event_Manager
- * @version    2.1.0.0
+ * @version    2.3.33
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -36,14 +36,14 @@ if ( $buttons ) {
 			if ( $cur_user_interested == 'event_rsvp_yes' ) {
 				echo aui()->alert(array(
 						'type'=> 'success',
-						'content'=> sprintf(__('You Replied: <b>Going!</b> %s', 'geodirevents'),'<a href="#" data-action="remove" data-type="event_rsvp_yes" data-gde="'.$gde.'" data-postid="'.$post->ID.'" class="geodir-ayi-btn-rsvp">'. __('Cancel', 'geodirevents').'</a>')
+						'content'=> sprintf(__('You Replied: <b>Going!</b> %s', 'geodirevents'),'<a href="#" data-action="remove" data-type="event_rsvp_yes" data-gde="'. esc_attr( $gde ) .'" data-postid="'. absint( $post->ID ) .'" class="geodir-ayi-btn-rsvp">'. esc_html__('Cancel', 'geodirevents').'</a>')
 					)
 				);
 
 			} elseif ( $cur_user_interested == 'event_rsvp_maybe' ) {
 				echo aui()->alert(array(
 						'type'=> 'warning',
-						'content'=> sprintf(__('You Replied: <b>Interested!</b> %s', 'geodirevents'),'<a href="#" data-action="remove" data-type="event_rsvp_maybe" data-gde="'.$gde.'" data-postid="'.$post->ID.'" class="geodir-ayi-btn-rsvp">'. __('Cancel', 'geodirevents').'</a>')
+						'content'=> sprintf(__('You Replied: <b>Interested!</b> %s', 'geodirevents'),'<a href="#" data-action="remove" data-type="event_rsvp_maybe" data-gde="'. esc_attr( $gde ) .'" data-postid="'. absint( $post->ID ) .'" class="geodir-ayi-btn-rsvp">'. esc_html__('Cancel', 'geodirevents').'</a>')
 					)
 				);
 			}
@@ -87,8 +87,8 @@ if ( $buttons ) {
 <?php } ?>
 <div class="geodir-ayi-wid geodir-ayi-whois-in">
 	<div class="d-flex w-100 justify-content-between">
-		<h5 class="mb-1 h5"><?php echo __('Going', 'geodirevents'); ?></h5>
-		<small class="text-muted"><?php echo wp_sprintf( _n( '1 response', '%s responses', $count['yes'], 'geodirevents'), $count['yes'] ); ?></small>
+		<h5 class="mb-1 h5"><?php echo esc_html__('Going', 'geodirevents'); ?></h5>
+		<small class="text-muted"><?php echo esc_html( wp_sprintf( _n( '1 response', '%s responses', $count['yes'], 'geodirevents'), $count['yes'] ) ); ?></small>
 	</div>
 	<?php if ($count['yes'] > 0) { ?>
 		<div class="geodir-ayi-item-list geodir-ayi-list-users row p-0 m-0">
@@ -96,14 +96,14 @@ if ( $buttons ) {
 		</div>
 	<?php } else { ?>
 		<p class="geodir-ayi-noone  text-muted mb-2">
-			<?php echo __('No responses yet.', 'geodirevents'); ?>
+			<?php echo esc_html__('No responses yet.', 'geodirevents'); ?>
 		</p>
 	<?php } ?>
 </div>
 <div class="geodir-ayi-wid">
 	<div class="d-flex w-100 justify-content-between">
-		<h5 class="mb-1 h5"><?php echo __('Interested', 'geodirevents'); ?></h5>
-		<small class="text-muted"><?php echo wp_sprintf(_n('1 response', '%s responses', $count['maybe'], 'geodirevents'), $count['maybe'] ); ?></small>
+		<h5 class="mb-1 h5"><?php echo esc_html__('Interested', 'geodirevents'); ?></h5>
+		<small class="text-muted"><?php echo esc_html( wp_sprintf(_n('1 response', '%s responses', $count['maybe'], 'geodirevents'), $count['maybe'] ) ); ?></small>
 	</div>
 	<?php if ($count['maybe'] > 0) { ?>
 		<div class="geodir-ayi-item-list geodir-ayi-list-users row p-0 m-0">
@@ -111,7 +111,7 @@ if ( $buttons ) {
 		</div>
 	<?php } else { ?>
 		<p class="geodir-ayi-noone text-muted ">
-			<?php echo __('No responses yet..', 'geodirevents'); ?>
+			<?php echo esc_html__('No responses yet..', 'geodirevents'); ?>
 		</p>
 	<?php } ?>
 </div>
